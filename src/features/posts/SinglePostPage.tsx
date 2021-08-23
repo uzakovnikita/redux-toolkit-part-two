@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useAppSelector } from '../../app/hooks';
 import { PostAuthor } from './PostAuthor';
+import { selectPostById } from './postsSlice';
 import { RouterParamsType } from './types';
 
 export const SinglePostPage = ({
@@ -8,9 +9,7 @@ export const SinglePostPage = ({
 }: RouterParamsType) => {
     const { postId } = match.params;
 
-    const post = useAppSelector((state) =>
-        state.posts.find(({ id }) => postId === id),
-    );
+    const post = useAppSelector(state => selectPostById(state, postId));
 
     if (!post) {
         return (
@@ -28,7 +27,7 @@ export const SinglePostPage = ({
                 <Link to={`/editPost/${post.id}`} className="button">
                     Edit Post
                 </Link>
-                <PostAuthor userId={post.userId}/>
+                <PostAuthor userId={post.user}/>
             </article>
         </section>
     );

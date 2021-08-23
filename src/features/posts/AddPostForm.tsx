@@ -1,13 +1,15 @@
+import { unwrapResult } from '@reduxjs/toolkit';
 import React, { useState } from 'react';
 
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 
-import { postAdded } from './postsSlice';
+import { addNewPost } from './postsSlice';
 
 export const AddPostForm = () => {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
-    const [userId, setUserId] = useState('');
+    const [user, setUser] = useState('');
+    const [addRequestStatus, setAddRequestStatus] = useState('idle');
 
     const dispatch = useAppDispatch();
     const users = useAppSelector(state => state.users);
@@ -18,18 +20,27 @@ export const AddPostForm = () => {
         setContent(e.target.value);
 
     const onAuhtorChanged = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setUserId(e.target.value);
+        setUser(e.target.value);
     }
 
-    const onSavePostClicked = () => {
-        if (title && content) {
-            dispatch(postAdded({ title, content, userId, reactions: {thumbsUp: 1} }));
+    const onSavePostClicked = async () => {
+        if (canSave) {
+            try {
+                setAddRequestStatus('pending');
+                const resultAction = await dispatch(addNewPost({title, content, user}));
+                unwrapResult(resultAction);
+                setTitle('');
+                setContent('');
+                setUser('');
+            } catch (err) {
+                console.error(`Failed to save the post: ${err}`);
+            } finally {
+                setAddRequestStatus('idle');
+            }
         }
-        setTitle('');
-        setContent('');
     };
 
-    const canSave = Boolean(title) && Boolean(content) && Boolean(userId);
+    const canSave = [title, content, user].every(Boolean) && addRequestStatus === 'idle';
 
     const usersOptions = users.map(user => {
         return (
@@ -52,7 +63,7 @@ export const AddPostForm = () => {
                     onChange={onTitleChanged}
                 />
                 <label htmlFor="postAuthor">Author:</label>
-                <select name="" id="postAuthor" value={userId} onChange={onAuhtorChanged}>
+                <select name="" id="postAuthor" value={user} onChange={onAuhtorChanged}>
                     <option value=""></option>
                     {usersOptions}
                 </select>

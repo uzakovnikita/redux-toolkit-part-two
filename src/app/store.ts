@@ -1,12 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit'
+import notificationReducer from '../features/notifications/notificationSlice';
 
 import postsReducer from '../features/posts/postsSlice';
-import userSlice from '../features/users/userSlice';
+import userReducer from '../features/users/userSlice';
 
 const store = configureStore({
   reducer: {
     posts: postsReducer,
-    users: userSlice
+    users: userReducer,
+    notifications: notificationReducer,
   }
 });
 

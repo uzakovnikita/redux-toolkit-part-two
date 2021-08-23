@@ -7,7 +7,7 @@ export type PostType = {
     title: string;
     content: string;
     date: string;
-    userId: string;
+    user: string;
     reactions: {
         [key in keyof typeof reactionEmoji]: number
     };
@@ -18,3 +18,6 @@ export type MathParamsType = {
 };
 
 export type RouterParamsType = RouteComponentProps<MathParamsType>;
+export type RouterUserParamsType = RouteComponentProps<{
+    user: string
+}>;
